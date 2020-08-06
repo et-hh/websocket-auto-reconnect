@@ -6,6 +6,7 @@
 2. 对连接状态做封装，connected：true,connecting,false，防止重复调用connect导致重复连接
 3. 断线重连机制
 4. stomp内执行error回调时不会把错误信息带给回调，这里做了封装，会把原生websocket错误对象以参数形式传给回调
+5. sockjs内原生websocket刚建立但尚未连接成功时调用disconnect会报错，对这种情况，会等到连接建立再disconnect
 
 ## example
 
