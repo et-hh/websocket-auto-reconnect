@@ -6,7 +6,7 @@
  * 3. 断线重连机制
  * 4. stomp内执行websocket的onclose回调时不会把错误信息带给回调，这里做了封装，会把原生websocket错误对象以参数形式传给回调
  * 5. 当sockjs处于连接中状态时，disconnect处理
- * 6. 断网后不重连
+ * 6. 断网过程中不重连，网络恢复后再自动重连
  * @author zhoujie
  */
 import SockJs from '@aicc/assets/sockjs'
