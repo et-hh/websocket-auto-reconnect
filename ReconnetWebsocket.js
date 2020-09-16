@@ -6,12 +6,15 @@
  * 3. 断线重连机制
  * 4. stomp内执行websocket的onclose回调时不会把错误信息带给回调，这里做了封装，会把原生websocket错误对象以参数形式传给回调
  * 5. 当sockjs处于连接中状态时，disconnect处理
+ * 6. 断网后不重连
  * @author zhoujie
  */
 import SockJs from '@aicc/assets/sockjs'
 import { generateRandom } from '@aicc/utils'
 import Stomp from 'stompjs'
 const logger = require('@aicc/utils/logger').logger('ReconnetWebsocket')
+const reChorme = new RegExp('Chrome/(\\d+\\.\\d+(?:\\.\\d+\\.\\d+))?')
+const isChrome = () => reChorme.test(window.navigator.userAgent)
 
 // 连接状态
 const CONNECTING = 'connecting'
@@ -124,6 +127,14 @@ export default class ReconnetWebsocket {
     this.disconnect()
     this.shouldReconnect = true
     this.timeout = setTimeout(async () => {
+      // 断网情况下，不做实际重连操作，只是循环调用等待联网后再实际重连
+      // 但只在chrome下做此处理，因为此属性在其他浏览器下可能不支持
+      if (isChrome() && !navigator.onLine) {
+        logger.warn('网络已断开，重连失败')
+        this.reConnect()
+        return
+      }
+
       await this.connect(
         this.params,
         this.successCb,
